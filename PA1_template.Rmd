@@ -3,23 +3,121 @@ title: "Reproducible Research: Peer Assessment 1"
 output: 
   html_document:
     keep_md: true
----
+----
 
 
 ## Loading and preprocessing the data
 
+```{r}
+library(plyr)
+library(lattice)
+setwd("F:/coursera/pa/")
+padata<-read.csv("activity.csv")
+```
 
 
 ## What is mean total number of steps taken per day?
 
+```{r}
+###Total number of steps per day
+stepsPerDay<-aggregate(steps~date,na.omit(padata),sum)
+head(stepsPerDay)
+```
 
+```{r, echo=FALSE }
+###histogram of the total number of steps taken each day
+hist(stepsPerDay$steps,
+     main = "Histogram of total steps taken each day - (nulls included)",
+     xlab="Steps per day")
+```
+
+###Calculate and report the mean and median of the total number of steps taken per day
+
+```{r}
+#mean
+
+stepsPerDayMean <- mean(stepsPerDay$steps)
+head(stepsPerDayMean)
+
+#median
+
+stepsPerDayMedian <- median(stepsPerDay$steps)
+head(stepsPerDayMedian)
+```
 
 ## What is the average daily activity pattern?
 
+###Plot interval vs Average steps
+```{r, echo=FALSE}
+intervalStepsMean<-aggregate(steps~interval,data=padata,mean)
+plot(intervalStepsMean,type='l',
+     col="blue",
+     main="Average Number of Steps across all days")
+```
+
+###Determine maximum 5 minute interval across all days
+```{r}
+intervalStepsMean[which.max(intervalStepsMean$steps),1]
+
+```
+
+## Inputing missing values
 
 
-## Imputing missing values
+```{r}
+###Total number of missing values in the dataset
+sum(is.na(padata))
 
+###New dataset with missing values filled in.
+padata1<-padata
+padata1$steps[is.na(padata1$steps)] <- intervalStepsMean$steps[is.na(padata1$steps)]
+head(padata1)
 
+###Calculate the total number of steps taken per day
+stepsPerDay1<-aggregate(steps~date,data=padata1,sum)
+head(stepsPerDay1)
 
-## Are there differences in activity patterns between weekdays and weekends?
+```
+
+```{r, echo=FALSE }
+#histogram of the total number of steps taken each day
+hist(stepsPerDay1$steps,
+     main = "Histogram of total steps taken each day - (nulls replaced)",
+     xlab="Steps per day")
+```
+
+```{r}
+###Calculate and report the mean and median of the total number of steps taken per day
+
+####mean
+stepsPerDayMean1 <- mean(stepsPerDay1$steps)
+stepsPerDayMean1
+
+####median
+stepsPerDayMedian1 <- median(stepsPerDay1$steps)
+stepsPerDayMean1
+
+## Differences between estimates of filled na with na values
+
+###Difference in Steps per Day Mean
+stepsPerDayMean1 - stepsPerDayMean
+
+###Difference in Steps per Day Median
+stepsPerDayMedian1 - stepsPerDayMedian
+
+```
+##Are there differences in activity patterns between weekdays and weekends?
+###Create a new factor variable withlevels - "weekday" and "weekend" 
+```{r}
+padata1$day<-as.factor(weekdays(as.Date(padata1$date)))
+padata1 <- within(padata1, levels(day)[grep("S+",levels(padata1$day))] <- "Weekend")
+padata1 <- within(padata1, levels(day)[levels(padata1$day) != "Weekend"] <- "Weekday")
+padata1$date<-NULL
+```
+###Plot time series data - interval vs steps by Weekend, Weekday
+```{r , echo = FALSE }
+padata1<-aggregate(steps~interval+day,data=padata1,mean)
+xyplot(steps ~ interval | day, data=padata1, type = "l", layout = c(1, 2), 
+       xlab = "Interval", ylab = "Number of steps")
+```
+
