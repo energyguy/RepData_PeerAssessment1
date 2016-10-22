@@ -1,8 +1,7 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
+title: "Reproducible Research: Peer Assessment 1 "
 output: 
-  html_document:
-    keep_md: true
+  html_document:keep_md: true
 ----
 
 ```{r opts, echo = FALSE}
@@ -11,7 +10,8 @@ knitr::opts_chunk$set(
 )
 ```
 
-## Loading and preprocessing the data
+
+## Loading and preprocessing the data.
 
 ```{r}
 library(plyr)
