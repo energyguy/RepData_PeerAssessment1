@@ -5,13 +5,18 @@ output:
     keep_md: true
 ----
 
+```{r opts, echo = FALSE}
+knitr::opts_chunk$set(
+  fig.path = "images/"
+)
+```
 
 ## Loading and preprocessing the data
 
 ```{r}
 library(plyr)
 library(lattice)
-setwd("F:/coursera/pa/")
+setwd("F:/coursera/repos/RepData_PeerAssessment1/")
 padata<-read.csv("activity.csv")
 ```
 
